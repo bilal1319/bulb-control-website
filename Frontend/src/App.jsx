@@ -12,7 +12,7 @@ function App() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/api/bulb-status')
+        const res = await axios.get('http://localhost:3000/api/bulb-status' || 'https://bulb-control-website.onrender.com/api/bulb-status')
         if (res.status === 200 && res.data.status) {
           setIsOn(res.data.status === 'on')
         }
