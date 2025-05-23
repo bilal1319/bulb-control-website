@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
-import {Navigate} from 'react-router-dom'
+import { axiosInstance } from './axios'
 
 function App() {
   const [isOn, setIsOn] = useState(false)
@@ -12,7 +11,7 @@ function App() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/api/bulb-status' || 'https://bulb-control-website.onrender.com/api/bulb-status')
+        const res = await axiosInstance.get('/bulb-status')
         if (res.status === 200 && res.data.status) {
           setIsOn(res.data.status === 'on')
         }
@@ -34,7 +33,7 @@ function App() {
     const newStatus = !isOn
 
     try {
-      const res = await axios.post('http://localhost:3000/api/toggle-bulb', {
+      const res = await axiosInstance.post('/toggle-bulb', {
         status: newStatus ? 'on' : 'off',
       })
       if (res.status === 200) {
