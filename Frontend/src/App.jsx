@@ -1,61 +1,52 @@
-import { useState, useEffect } from 'react'
-import { axiosInstance } from './axios'
+import { useState, useEffect } from 'react';
+import { axiosInstance } from './axios';
 
 function App() {
-  const [isOn, setIsOn] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [initialLoading, setInitialLoading] = useState(true) // NEW for initial fetch
-  const [error, setError] = useState(null)
+  const [isOn, setIsOn] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch initial bulb status from backend on mount
   useEffect(() => {
-    const fetchStatus = async () => {
+    async function fetchStatus() {
       try {
-        const res = await axiosInstance.get('/bulb-status')
+        const res = await axiosInstance.get('/bulb-status');
         if (res.status === 200 && res.data.status) {
-          setIsOn(res.data.status === 'on')
+          setIsOn(res.data.status === 'on');
         }
-      } catch (err) {
-        console.error('Fetch status error:', err)
-        setError('Failed to fetch bulb status')
+      } catch {
+        setError('Failed to fetch bulb status');
       } finally {
-        setInitialLoading(false)  // Hide full-page loader here
+        setInitialLoading(false);
       }
     }
-    fetchStatus()
-  }, [])
+    fetchStatus();
+  }, []);
 
   const toggleBulb = async () => {
-    if (loading) return
-
-    setLoading(true)
-    setError(null)
-    const newStatus = !isOn
+    if (loading) return;
+    setLoading(true);
+    setError(null);
+    const newStatus = !isOn ? 'on' : 'off';
 
     try {
-      const res = await axiosInstance.post('/toggle-bulb', {
-        status: newStatus ? 'on' : 'off',
-      })
+      const res = await axiosInstance.post('/toggle-bulb', { status: newStatus });
       if (res.status === 200) {
-        setIsOn(newStatus)
+        setIsOn(newStatus === 'on');
       }
-      console.log(`Toggle response: ${res.data.message}`)
-    } catch (err) {
-      console.error('Toggle error:', err)
-      setError('Failed to toggle bulb')
+    } catch {
+      setError('Failed to toggle bulb');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (initialLoading) {
-    // Full page loading indicator while fetching initial status
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600"></div>
-        {/* Simple spinner, you can customize or add text */}
       </div>
-    )
+    );
   }
 
   return (
@@ -70,7 +61,7 @@ function App() {
         disabled={loading}
         aria-label="Toggle bulb"
       >
-        {/* Optional icon */}
+        {/* Optional icon or text */}
       </button>
 
       <p className="mt-4 text-lg text-gray-700">
@@ -79,7 +70,7 @@ function App() {
 
       {error && <p className="text-red-600 mt-2">{error}</p>}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
