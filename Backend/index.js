@@ -40,17 +40,7 @@ function sendGPIOSignal(status) {
   */
 }
 
-// Serve frontend in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../Frontend/dist')));
-
-  app.get('/*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../Frontend/dist/index.html'));
-  });
-}
-
-
-// API routes
+// API routes - define these BEFORE the static file serving
 app.get('/api/bulb-status', (req, res) => {
   res.json({ status: bulbStatus });
 });
@@ -65,6 +55,16 @@ app.post('/api/toggle-bulb', (req, res) => {
   sendGPIOSignal(status);
   res.json({ message: `Bulb is now ${status}` });
 });
+
+// Serve frontend in production - this should come AFTER API routes
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../Frontend/dist')));
+
+  // Fixed: Use '*' instead of '/*' for catch-all route
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../Frontend/dist/index.html'));
+  });
+}
 
 // Start server
 const PORT = process.env.PORT || 3000;
